@@ -1,12 +1,12 @@
-// components/ProductCard.tsx
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
-import { Product } from '@/store/slices/productSlice';
 import { AntDesign } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToWishlist, removeFromWishlist } from '../store/slices/wishlistSlice'
 import { addToCart, updateQuantity } from '@/store/slices/cartSlice';
 import { RootState } from '@/store/store';
+import { Product } from '@/types/product';
+import { useNavigation } from '@react-navigation/native';
 
 interface Props {
   product: Product;
@@ -16,11 +16,15 @@ export default function ProductCard({ product }: Props) {
   const dispatch = useDispatch();
   const wishlist = useSelector((state: RootState) => state.wishlist.items);
   const cartItems = useSelector((state: RootState) => state.cart.items);
-  const quantity = cartItems[product.id]?.quantity || 0;
+  const cartItem = cartItems.find(item => item.id === product.id);
+  const quantity = cartItem?.quantity || 0;
   const isWishlisted = wishlist.some(item => item.id === product.id);
+  const navigation = useNavigation()
 
   const toggleWishlist = () => {
-    if (isWishlisted) dispatch(removeFromWishlist(product.id));
+    if (isWishlisted) {
+      dispatch(removeFromWishlist(product.id));
+    }
     else dispatch(addToWishlist(product));
   };
 
@@ -31,7 +35,7 @@ export default function ProductCard({ product }: Props) {
   };
 
   return (
-    <View className="flex-1 m-2 bg-white rounded-2xl p-3 shadow-md relative">
+    <TouchableOpacity className="flex-1 m-2 bg-white rounded-md p-3 shadow-md relative" onPress={() => navigation.navigate('ProductDetail', { product })}>
       <View className="relative items-center">
         <Image source={{ uri: product.image }} className="w-full h-32 mb-2" resizeMode="contain" />
         <TouchableOpacity className="absolute top-1 right-0 p-1" onPress={toggleWishlist}>
@@ -63,6 +67,6 @@ export default function ProductCard({ product }: Props) {
           </View>
         )}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }

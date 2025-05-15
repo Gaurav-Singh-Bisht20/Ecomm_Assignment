@@ -14,6 +14,7 @@ export default function HomeScreen() {
   useEffect(() => {
     const fetchProductList = async () => {
       const response = await get<Product[]>("/products");
+      console.log("response of products api",response);
       dispatch(setProducts(response));
     };
     fetchProductList();
